@@ -1,0 +1,127 @@
+.admin-form-page {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px 16px;
+    background: linear-gradient(160deg, #f1f5ff 0%, #ffffff 55%, #edf8f6 100%);
+    font-family: "Outfit", "Segoe UI", sans-serif;
+}
+
+.admin-form-card {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #d9e2f2;
+    border-radius: 14px;
+    box-shadow: 0 16px 36px -24px rgba(25, 44, 79, 0.45);
+}
+
+.admin-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.admin-form-header h2 {
+    margin: 0;
+    color: #182649;
+}
+
+.admin-form-header a {
+    text-decoration: none;
+    color: #1f3b64;
+    font-weight: 600;
+}
+
+.admin-form-header a:hover {
+    text-decoration: underline;
+}
+
+.admin-form-error {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #efc0c0;
+    background: #fff1f1;
+    color: #8b2222;
+    font-weight: 600;
+}
+
+.admin-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.admin-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-form__field label {
+    font-weight: 600;
+    color: #20345c;
+}
+
+.admin-form__field input,
+.admin-form__field select {
+    height: 42px;
+    border: 1px solid #c8d4ea;
+    border-radius: 10px;
+    padding: 0 12px;
+    font-size: 0.96rem;
+    color: #1d2d4d;
+    background: #fff;
+}
+
+.admin-form__field input:focus,
+.admin-form__field select:focus {
+    outline: none;
+    border-color: #2e7d73;
+    box-shadow: 0 0 0 3px rgba(46, 125, 115, 0.16);
+}
+
+.admin-form__checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+}
+
+.admin-form__checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #d8e2f2;
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: #f8fbff;
+}
+
+.admin-form__checkbox-item input {
+    width: 16px;
+    height: 16px;
+}
+
+.admin-form__actions {
+    margin-top: 4px;
+}
+
+.admin-form__actions button {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: 1px solid #186f65;
+    background: #186f65;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-form__actions button:hover {
+    background: #145a52;
+    border-color: #145a52;
+}

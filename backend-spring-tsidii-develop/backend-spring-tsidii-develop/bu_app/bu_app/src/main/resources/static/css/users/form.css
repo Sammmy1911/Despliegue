@@ -1,0 +1,106 @@
+.user-form-page {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px 16px;
+    background: linear-gradient(160deg, #f1f5ff 0%, #ffffff 55%, #edf8f6 100%);
+    font-family: "Outfit", "Segoe UI", sans-serif;
+}
+
+.user-form-card {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #d9e2f2;
+    border-radius: 14px;
+    box-shadow: 0 16px 36px -24px rgba(25, 44, 79, 0.45);
+}
+
+.user-form-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.user-form-card__header h2 {
+    margin: 0;
+    color: #182649;
+}
+
+.user-form-card__header a {
+    text-decoration: none;
+    color: #1f3b64;
+    font-weight: 600;
+}
+
+.user-form-card__header a:hover {
+    text-decoration: underline;
+}
+
+.user-form-card__error {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #efc0c0;
+    background: #fff1f1;
+    color: #8b2222;
+    font-weight: 600;
+}
+
+.user-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.user-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.user-form__field label {
+    font-weight: 600;
+    color: #20345c;
+}
+
+.user-form__field input,
+.user-form__field select {
+    height: 42px;
+    border: 1px solid #c8d4ea;
+    border-radius: 10px;
+    padding: 0 12px;
+    font-size: 0.96rem;
+    color: #1d2d4d;
+    background: #fff;
+}
+
+.user-form__field input:focus,
+.user-form__field select:focus {
+    outline: none;
+    border-color: #2e7d73;
+    box-shadow: 0 0 0 3px rgba(46, 125, 115, 0.16);
+}
+
+.user-form__actions {
+    margin-top: 4px;
+}
+
+.user-form__actions button {
+    height: 42px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: 1px solid #186f65;
+    background: #186f65;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.user-form__actions button:hover {
+    background: #145a52;
+    border-color: #145a52;
+}

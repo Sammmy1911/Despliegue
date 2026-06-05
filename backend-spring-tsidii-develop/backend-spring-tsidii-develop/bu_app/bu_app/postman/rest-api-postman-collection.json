@@ -1,0 +1,2052 @@
+{
+  "info": {
+    "name": "BU App REST API Automated Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Automated Postman collection for BU App Spring Boot REST controllers, JWT auth flow, and CRUD testing.",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (get JWT token)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/auth/login"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin@icesi.edu.co\",\n  \"password\": \"admin123\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Authenticate with JWT and store token into environment variable."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('token');",
+                  "pm.environment.set('jwt_token', jsonData.token);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "item": [
+        {
+          "name": "Create Alerts",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/alerts"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Postman automated alert\",\n  \"sendDate\": \"2025-01-01T10:00:00.000Z\",\n  \"trainerId\": \"{{trainer_id}}\",\n  \"traineeId\": \"{{trainee_id}}\"\n}"
+            },
+            "description": "Create a new Alerts resource and store its generated ID into { alert_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('alert_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Alerts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/alerts/all"
+            },
+            "description": "Retrieve the list of all Alerts."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Alerts by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/alerts/{{alert_id}}"
+            },
+            "description": "Retrieve a single Alerts by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('alert_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Alerts",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/alerts/{{alert_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Updated Postman alert\",\n  \"sendDate\": \"2025-01-02T10:00:00.000Z\",\n  \"trainerId\": \"{{trainer_id}}\",\n  \"traineeId\": \"{{trainee_id}}\"\n}"
+            },
+            "description": "Update the Alerts resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('message');",
+                  "pm.expect(jsonData.message).to.eql('Updated Postman alert');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Alerts",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/alerts/{{alert_id}}"
+            },
+            "description": "Delete the Alerts resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Alerts Paginated",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/alerts?page=0&size=10"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('content');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Create Events",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/events"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman automated event\",\n  \"description\": \"Generated by Postman collection\",\n  \"managerId\": \"{{trainer_id}}\"\n}"
+            },
+            "description": "Create a new Events resource and store its generated ID into { event_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('event_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Events",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/events/all"
+            },
+            "description": "Retrieve the list of all Events."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Events by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/events/{{event_id}}"
+            },
+            "description": "Retrieve a single Events by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('event_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Events",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/events/{{event_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Postman event\",\n  \"description\": \"Updated by Postman test\",\n  \"managerId\": \"{{trainer_id}}\"\n}"
+            },
+            "description": "Update the Events resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('name');",
+                  "pm.expect(jsonData.name).to.eql('Updated Postman event');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Events",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/events/{{event_id}}"
+            },
+            "description": "Delete the Events resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Event Places",
+      "item": [
+        {
+          "name": "Create Event Places",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/events-places"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2025-02-10T10:00:00.000Z\",\n  \"endDate\": \"2025-02-10T11:00:00.000Z\",\n  \"eventId\": \"{{event_id_existing}}\",\n  \"placeId\": \"{{place_id_existing}}\"\n}"
+            },
+            "description": "Create a new Event Places resource and store its generated ID into { event_place_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('event_place_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Event Places",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/events-places/all"
+            },
+            "description": "Retrieve the list of all Event Places."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Event Places by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/events-places/{{event_place_id}}"
+            },
+            "description": "Retrieve a single Event Places by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('event_place_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Event Places",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/events-places/{{event_place_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2025-02-11T10:00:00.000Z\",\n  \"endDate\": \"2025-02-11T11:30:00.000Z\",\n  \"eventId\": \"{{event_id_existing}}\",\n  \"placeId\": \"{{place_id_existing}}\"\n}"
+            },
+            "description": "Update the Event Places resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('eventId');",
+                  "pm.expect(jsonData.eventId).to.eql(parseInt(pm.environment.get('event_id_existing')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Event Places",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/events-places/{{event_place_id}}"
+            },
+            "description": "Delete the Event Places resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exercises",
+      "item": [
+        {
+          "name": "Create Exercises",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/exercises"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Exercise\",\n  \"length\": 20,\n  \"description\": \"Created by Postman test\",\n  \"video\": \"VGVzdCB2aWRlbyBjb250ZW50\",\n  \"custom\": true,\n  \"difficultyId\": \"{{difficulty_id}}\",\n  \"typeId\": \"{{type_id}}\",\n  \"ownerCode\": \"{{trainee_id}}\"\n}"
+            },
+            "description": "Create a new Exercises resource and store its generated ID into { exercise_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('exercise_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Exercises",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/exercises"
+            },
+            "description": "Retrieve the list of all Exercises."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Exercises by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/exercises/{{exercise_id}}"
+            },
+            "description": "Retrieve a single Exercises by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('exercise_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Exercises",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/exercises/{{exercise_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Postman Exercise\",\n  \"length\": 25,\n  \"description\": \"Updated exercise description\",\n  \"video\": \"VGVzdCB2aWRlbyBidXR0b24=\",\n  \"custom\": true,\n  \"difficultyId\": \"{{difficulty_id}}\",\n  \"typeId\": \"{{type_id}}\",\n  \"ownerCode\": \"{{trainee_id}}\"\n}"
+            },
+            "description": "Update the Exercises resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('name');",
+                  "pm.expect(jsonData.name).to.eql('Updated Postman Exercise');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Exercises",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/exercises/{{exercise_id}}"
+            },
+            "description": "Delete the Exercises resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exercise Difficulties",
+      "item": [
+        {
+          "name": "Create Exercise Difficulties",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-difficulties"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Difficulty\"\n}"
+            },
+            "description": "Create a new Exercise Difficulties resource and store its generated ID into { difficulty_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('difficulty_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Exercise Difficulties",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-difficulties"
+            },
+            "description": "Retrieve the list of all Exercise Difficulties."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Exercise Difficulties by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-difficulties/{{difficulty_id}}"
+            },
+            "description": "Retrieve a single Exercise Difficulties by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('difficulty_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Exercise Difficulties",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-difficulties/{{difficulty_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Postman Difficulty\"\n}"
+            },
+            "description": "Update the Exercise Difficulties resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('name');",
+                  "pm.expect(jsonData.name).to.eql('Updated Postman Difficulty');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Exercise Difficulties",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-difficulties/{{difficulty_id}}"
+            },
+            "description": "Delete the Exercise Difficulties resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exercise Types",
+      "item": [
+        {
+          "name": "Create Exercise Types",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-types"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Exercise Type\"\n}"
+            },
+            "description": "Create a new Exercise Types resource and store its generated ID into { type_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('type_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Exercise Types",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-types"
+            },
+            "description": "Retrieve the list of all Exercise Types."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Exercise Types by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-types/{{type_id}}"
+            },
+            "description": "Retrieve a single Exercise Types by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('type_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Exercise Types",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-types/{{type_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Postman Exercise Type\"\n}"
+            },
+            "description": "Update the Exercise Types resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('name');",
+                  "pm.expect(jsonData.name).to.eql('Updated Postman Exercise Type');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Exercise Types",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/exercise-types/{{type_id}}"
+            },
+            "description": "Delete the Exercise Types resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Places",
+      "item": [
+        {
+          "name": "Create Places",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/places"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Place\",\n  \"statusId\": \"{{status_id}}\"\n}"
+            },
+            "description": "Create a new Places resource and store its generated ID into { place_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('place_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Places",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/places/all"
+            },
+            "description": "Retrieve the list of all Places."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Places by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/places/{{place_id}}"
+            },
+            "description": "Retrieve a single Places by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('place_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Places",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/places/{{place_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Postman Place\",\n  \"statusId\": \"{{status_id}}\"\n}"
+            },
+            "description": "Update the Places resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('name');",
+                  "pm.expect(jsonData.name).to.eql('Updated Postman Place');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Places",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/places/{{place_id}}"
+            },
+            "description": "Delete the Places resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Progresses",
+      "item": [
+        {
+          "name": "Create Progresses",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/progresses"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"repetitions\": 12,\n  \"time\": \"20min\",\n  \"stressLevelId\": \"{{stress_level_id}}\",\n  \"progressTypeId\": \"{{progress_type_id}}\",\n  \"traineeId\": \"{{trainee_id}}\",\n  \"routineId\": \"{{routine_id_existing}}\"\n}"
+            },
+            "description": "Create a new Progresses resource and store its generated ID into { progress_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('progress_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Progresses",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/progresses/all"
+            },
+            "description": "Retrieve the list of all Progresses."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Progresses by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/progresses/{{progress_id}}"
+            },
+            "description": "Retrieve a single Progresses by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('progress_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Progresses",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/progresses/{{progress_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"repetitions\": 15,\n  \"time\": \"25min\",\n  \"stressLevelId\": \"{{stress_level_id}}\",\n  \"progressTypeId\": \"{{progress_type_id}}\",\n  \"traineeId\": \"{{trainee_id}}\",\n  \"routineId\": \"{{routine_id_existing}}\"\n}"
+            },
+            "description": "Update the Progresses resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('repetitions');",
+                  "pm.expect(jsonData.repetitions).to.eql(15);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Progresses",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/progresses/{{progress_id}}"
+            },
+            "description": "Delete the Progresses resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Progress Types",
+      "item": [
+        {
+          "name": "Create Progress Types",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/progress-types"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"Postman Progress Type\"\n}"
+            },
+            "description": "Create a new Progress Types resource and store its generated ID into { progress_type_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('progress_type_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Progress Types",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/progress-types/all"
+            },
+            "description": "Retrieve the list of all Progress Types."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Progress Types by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/progress-types/{{progress_type_id}}"
+            },
+            "description": "Retrieve a single Progress Types by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('progress_type_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Progress Types",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/progress-types/{{progress_type_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"Updated Postman Progress Type\"\n}"
+            },
+            "description": "Update the Progress Types resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('type');",
+                  "pm.expect(jsonData.type).to.eql('Updated Postman Progress Type');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Progress Types",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/progress-types/{{progress_type_id}}"
+            },
+            "description": "Delete the Progress Types resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "Create Recommendations",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/recommendations"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Postman recommendation\",\n  \"trainerId\": \"{{trainer_id}}\",\n  \"progressId\": \"{{progress_id_existing}}\"\n}"
+            },
+            "description": "Create a new Recommendations resource and store its generated ID into { recommendation_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('recommendation_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Recommendations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/recommendations/all"
+            },
+            "description": "Retrieve the list of all Recommendations."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recommendations by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/recommendations/{{recommendation_id}}"
+            },
+            "description": "Retrieve a single Recommendations by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('recommendation_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Recommendations",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/recommendations/{{recommendation_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated Postman recommendation\",\n  \"trainerId\": \"{{trainer_id}}\",\n  \"progressId\": \"{{progress_id_existing}}\"\n}"
+            },
+            "description": "Update the Recommendations resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('description');",
+                  "pm.expect(jsonData.description).to.eql('Updated Postman recommendation');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Recommendations",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/recommendations/{{recommendation_id}}"
+            },
+            "description": "Delete the Recommendations resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Routines",
+      "item": [
+        {
+          "name": "Create Routines",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/routines"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Routine\",\n  \"trainerCode\": \"{{trainer_id}}\",\n  \"traineeCode\": \"{{trainee_id}}\"\n}"
+            },
+            "description": "Create a new Routines resource and store its generated ID into { routine_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('routine_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Routines",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/routines"
+            },
+            "description": "Retrieve the list of all Routines."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Routines by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/routines/{{routine_id}}"
+            },
+            "description": "Retrieve a single Routines by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('routine_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Routines",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/routines/{{routine_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Postman Routine\",\n  \"trainerCode\": \"{{trainer_id}}\",\n  \"traineeCode\": \"{{trainee_id}}\"\n}"
+            },
+            "description": "Update the Routines resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('name');",
+                  "pm.expect(jsonData.name).to.eql('Updated Postman Routine');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Routines",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/routines/{{routine_id}}"
+            },
+            "description": "Delete the Routines resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Routine Exercises",
+      "item": [
+        {
+          "name": "Create Routine Exercises",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/routine-exercises"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exerciseId\": \"{{exercise_id_existing}}\",\n  \"routineId\": \"{{routine_id_existing}}\"\n}"
+            },
+            "description": "Create a new Routine Exercises resource and store its generated ID into { routine_exercise_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('routine_exercise_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Routine Exercises",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/routine-exercises"
+            },
+            "description": "Retrieve the list of all Routine Exercises."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Routine Exercises by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/routine-exercises/{{routine_exercise_id}}"
+            },
+            "description": "Retrieve a single Routine Exercises by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('routine_exercise_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Routine Exercises",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/routine-exercises/{{routine_exercise_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exerciseId\": \"{{exercise_id_existing}}\",\n  \"routineId\": \"{{routine_id_existing}}\"\n}"
+            },
+            "description": "Update the Routine Exercises resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('exerciseId');",
+                  "pm.expect(jsonData.exerciseId).to.eql(parseInt(pm.environment.get('exercise_id_existing')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Routine Exercises",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/routine-exercises/{{routine_exercise_id}}"
+            },
+            "description": "Delete the Routine Exercises resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Statuses",
+      "item": [
+        {
+          "name": "Create Statuses",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/statuses"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Postman Status\"\n}"
+            },
+            "description": "Create a new Statuses resource and store its generated ID into { status_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('status_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Statuses",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/statuses/all"
+            },
+            "description": "Retrieve the list of all Statuses."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Statuses by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/statuses/{{status_id}}"
+            },
+            "description": "Retrieve a single Statuses by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('status_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Statuses",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/statuses/{{status_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Updated Postman Status\"\n}"
+            },
+            "description": "Update the Statuses resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('status');",
+                  "pm.expect(jsonData.status).to.eql('Updated Postman Status');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Statuses",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/statuses/{{status_id}}"
+            },
+            "description": "Delete the Statuses resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stress Levels",
+      "item": [
+        {
+          "name": "Create Stress Levels",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/rest/stress-levels"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"Postman Stress Level\"\n}"
+            },
+            "description": "Create a new Stress Levels resource and store its generated ID into { stress_level_id }."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.response.to.have.status(201); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.environment.set('stress_level_id', jsonData.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get all Stress Levels",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/stress-levels/all"
+            },
+            "description": "Retrieve the list of all Stress Levels."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.be.an('array');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Stress Levels by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/rest/stress-levels/{{stress_level_id}}"
+            },
+            "description": "Retrieve a single Stress Levels by its stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('id');",
+                  "pm.expect(jsonData.id).to.eql(parseInt(pm.environment.get('stress_level_id')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Stress Levels",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{base_url}}/rest/stress-levels/{{stress_level_id}}"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"Updated Postman Stress Level\"\n}"
+            },
+            "description": "Update the Stress Levels resource created earlier."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "const jsonData = pm.response.json();",
+                  "pm.expect(jsonData).to.have.property('level');",
+                  "pm.expect(jsonData.level).to.eql('Updated Postman Stress Level');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Stress Levels",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/rest/stress-levels/{{stress_level_id}}"
+            },
+            "description": "Delete the Stress Levels resource using the stored ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

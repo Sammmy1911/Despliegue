@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin/list.css}">
+    <title>Lista de Permisos</title>
+</head>
+
+<body>
+    <div class="admin-list-page">
+        <div class="admin-list-header">
+            <h2>Lista de permisos</h2>
+            <a class="admin-primary-btn" th:href="@{/permissions/add}">Agregar permiso</a>
+        </div>
+
+        <form class="admin-size-form" th:action="@{/permissions}" method="get">
+            <input type="hidden" name="page" value="0">
+            <label for="size">Elementos por página:</label>
+            <select id="size" name="size" onchange="this.form.submit()">
+                <option th:selected="${size == 5}" value="5">5</option>
+                <option th:selected="${size == 10}" value="10">10</option>
+                <option th:selected="${size == 20}" value="20">20</option>
+                <option th:selected="${size == 50}" value="50">50</option>
+            </select>
+        </form>
+
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="permission : ${permissions}">
+                    <td th:text="${permission.id}">1</td>
+                    <td th:text="${permission.name}">READ_USER</td>
+                    <td>
+                        <a class="admin-action admin-action--edit" th:href="@{/permissions/edit(id=${permission.id})}">Editar</a>
+                        <a class="admin-action admin-action--delete" th:href="@{/permissions/delete(id=${permission.id})}"
+                            onclick="return confirm('¿Estás seguro de que quieres eliminar este permiso?');">Eliminar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <nav class="admin-pagination" th:if="${totalPages > 0}">
+            <p class="admin-pagination__info" th:text="|Página ${currentPage + 1} de ${totalPages}|">Página 1 de 1</p>
+            <div class="admin-pagination__controls">
+                <a class="admin-pagination__link" th:if="${currentPage > 0}" th:href="@{/permissions(page=${currentPage - 1}, size=${size})}">Anterior</a>
+                <span class="admin-pagination__pages" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a class="admin-pagination__link" th:if="${pageNumber != currentPage}" th:href="@{/permissions(page=${pageNumber}, size=${size})}"
+                    th:text="${pageNumber + 1}">1</a>
+                    <strong class="admin-pagination__current" th:if="${pageNumber == currentPage}" th:text="${pageNumber + 1}">1</strong>
+                </span>
+                <a class="admin-pagination__link" th:if="${currentPage + 1 < totalPages}"
+                    th:href="@{/permissions(page=${currentPage + 1}, size=${size})}">Siguiente</a>
+            </div>
+        </nav>
+    </div>
+</body>
+
+</html>
